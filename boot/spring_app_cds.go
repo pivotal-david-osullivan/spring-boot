@@ -48,6 +48,7 @@ type SpringAppCDS struct {
 func NewSpringAppCDS(cache libpak.DependencyCache, appPath string, manifest *properties.Properties, aotEnabled bool) SpringAppCDS {
 	contributor := libpak.NewLayerContributor("spring-app-cds", cache, libcnb.LayerTypes{
 		Build: true,
+		Launch: true,
 	})
 	return SpringAppCDS{
 		LayerContributor: contributor,
@@ -129,6 +130,7 @@ func (s SpringAppCDS) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 		var trainingRunArgs []string
 		if s.AotEnabled {
 			trainingRunArgs = append(trainingRunArgs, "-Dspring.aot.enabled=true")
+			layer.LaunchEnvironment.Default("BPL_APP_CDS_AOT_ENABLED", "true")
 		}
 		trainingRunArgs = append(trainingRunArgs,
 			"-Dspring.context.exit=onRefresh",
@@ -145,6 +147,7 @@ func (s SpringAppCDS) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 		}); err != nil {
 			return libcnb.Layer{}, fmt.Errorf("error running build\n%w", err)
 		}
+
 		return layer, nil
 	})
 
